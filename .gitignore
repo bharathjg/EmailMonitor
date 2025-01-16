@@ -1,0 +1,4 @@
+.venv
+.env
+read_inbox.py
+test.py
