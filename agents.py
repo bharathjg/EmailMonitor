@@ -10,18 +10,24 @@ class Screener:
         self.openai_key = openai_key
         self.base_url = base_url
         self.screener_prompt = """
-        You are an arbiter responsible for screening a user's emails. You will decide if the content of an email is important or not.
+        You are an arbiter responsible for screening a user's emails. You will decide ifan email is important or not based on who the email is from and what the subject of the email is.
 
         An email is considered important if:
-        - The subject line or content relates to jobs
-        - The subject line or content is something personal to the user
-        - The subject line or content relates to the user's bank accounts
-        - The subject line or content relates to an e-Commerce order
+        - The subject line relates to jobs
+        - The subject line is something personal to the user
+        - The subject line relates to the user's bank accounts
+        - The subject line relates to an e-Commerce order
 
-        You will receive a list of items. Each item of the list is an email as a structured JSON with the keys "From", "Subject" and "Content". 
+        An email is not important if:
+        - It encourages the recipient to purchase something
+        - It advertises something
+        - It asks the recipient to apply to something
+
+        You will receive a list of items. Each item of the list is an email as a structured JSON with the keys "From" and "Subject". 
         
         Evaluate each item in the list and add a new key "Important". If the email is considered important, set its value to "Y" or "N" if it is not important. Return only the modified list of items and nothing else.
         If you are unable to evaluate the input as per these instructions, respond with "Failed to screen".
+        Your output must be only JSON, without additional markers such as triple quotes (''') or backticks (```).
 
         List:
         {emails}
@@ -50,6 +56,7 @@ class Summarizer:
         
         Read the "Content" key's value of each item in the list and make a brief summary with a maximum limit of 20 words. The summary must be crisp and straight to the point. Do not furnish your response with irrelevant or unnecessary information.
         Return a list of the summarized content, with each summary as an item of this list. If you are unable to do this, return an empty list.
+        Your output must be devoid of additional markers such as triple quotes (''') or backticks (```).
 
         List:
         {emails}

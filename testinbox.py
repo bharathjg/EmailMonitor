@@ -67,7 +67,7 @@ class EmailRead:
 
                 # Extract From
                 from_header = decode_header(email_message['From'])[0][0]
-                from_header = from_header.decode() if isinstance(from_header, bytes) else from_header
+                from_header = from_header.decode('utf-8', errors='ignore') if isinstance(from_header, bytes) else from_header
 
                 # Extract Body
                 body = ""
