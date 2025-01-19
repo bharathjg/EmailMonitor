@@ -17,13 +17,13 @@ def main():
     emails = clean_emails(emails)
 
     screener = Screener(openai_key, base_url)
-    print(f'Processing email: {emails[:5]}')
+    print(f'Processing email: {emails[:20]}')
     print('Screening...')
-    screener_output = json.loads(screener.screen_emails(emails[:5]))
+    screener_output = json.loads(screener.screen_emails(emails[:20]))
     print('Printing screener o/p')
     print(screener_output)
 
-    processed_emails = process_screened_emails(screener_output, emails[:5])
+    processed_emails = process_screened_emails(screener_output, emails[:20])
     print('Printing processed screener o/p')
     print(processed_emails)
 
@@ -33,6 +33,10 @@ def main():
     summarizer_output = ast.literal_eval(summarizer.summarize_emails(processed_emails))
     print('Printing summarizer output')
     print(summarizer_output)
+
+    final_message = generate_final_message(emails[:20], processed_emails, summarizer_output)
+    print('Final message')
+    print(final_message)
 
 def process_screened_emails(screener_output, emails):
     processed_output = []
@@ -48,5 +52,27 @@ def clean_emails(emails):
         email['Content'] = clean_email_text(email['Content'])
         emails[i] = email
     return emails
+
+def generate_final_message(emails, processed_screener_output, summarizer_output):
+    final_message = ""
+    template = '''You have {num_imp} important emails out of {num_total} emails that you should check out. Here's a summary:\n\n{summary}
+    '''
+    num_total = len(emails)
+    num_imp = len(summarizer_output)
+
+    if num_imp==0:
+        return f"You have 0 important emails out of {num_total} emails, welp"
+    
+    summary = ""
+    for i in range(num_imp):
+        sender = processed_screener_output[i]['From']
+        summary = summary + f"From: {sender}\nSummary: {summarizer_output[i]}\n\n"
+    
+    # Stripping off the last newline character
+    summary = summary[:-1]
+    final_message = template.format(num_imp=num_imp, num_total=num_total, summary=summary)
+
+    return final_message
+
 
 main()
